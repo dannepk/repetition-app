@@ -5,12 +5,12 @@ import os
 import time
 gi.require_version('Gtk', '4.0')
 gi.require_version('Adw', '1')
-from gi.repository import Gtk, Adw, Gio
+from gi.repository import Gtk, Adw, Gio,Gdk
 
 def load_file_content(file_path, description):
     try:
         with open(file_path, 'r', encoding='utf-8') as file:
-            content = description + "\n" + file.read()
+            content = "\n\n" + description + "\n" + file.read()
         return content
     except Exception as e:
         print(f"An error occurred while reading the file: {e}")
@@ -19,7 +19,7 @@ def load_file_content(file_path, description):
 class MainWindow(Gtk.ApplicationWindow):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.set_default_size(800, 600)
+        self.set_default_size(1200, 800)
         self.set_title("Repetition")
 
         self.box1 = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=10)
@@ -45,8 +45,19 @@ class MainWindow(Gtk.ApplicationWindow):
         self.textView.set_wrap_mode(Gtk.WrapMode.WORD)
         self.textView.set_bottom_margin(20)
 
+        self.apply_css()
+
         self.scrolledWindow.set_child(self.textView)
         self.box1.append(self.scrolledWindow)
+    
+    def apply_css(self):
+        css_provider = Gtk.CssProvider()
+        script_dir = os.path.dirname(os.path.realpath(__file__))
+        css_path = os.path.join(script_dir, 'style.css')
+        css_provider.load_from_path(css_path)
+
+        display = Gdk.Display.get_default()
+        Gtk.StyleContext.add_provider_for_display(display, css_provider, Gtk.STYLE_PROVIDER_PRIORITY_APPLICATION)
 
     def load_questions(self, button):
         # Load initial text content into the TextView
